@@ -1,0 +1,72 @@
+<template>
+    <lightning-card>
+        <lightning-button if:true={showMessages} label="Salesforce WhatsApp"
+            title="Salesforce WhatsApp" variant="success" slot="actions">
+        </lightning-button>
+        <lightning-spinner variant="brand" alternative-text="loading.." if:true={isSpinner}></lightning-spinner>
+        <div class="slds-m-around_small" if:false={showMessages}>
+            <p>
+                <lightning-input required message-when-value-missing="Please provide the phone of the customer" type="text"
+                    placeholder="Enter Customer Phone Number and Click Next...."
+                    label="Send Message" variant="label-hidden"
+                    onchange={handlePhoneChange}>
+                </lightning-input>
+            </p>
+            <p class="slds-m-top_medium">
+                <lightning-button variant="brand" label="Chat with Customer" title="Chat with Customer" onclick={handleChat}></lightning-button>
+            </p>
+        </div>
+        <section if:true={showMessages} role="log" class="chatArea slds-chat slds-scrollable" style="height: 400px;">
+            <ul class="slds-chat-list">
+                <template for:each={messages} for:item="message" for:index="index">
+                    <li class="slds-chat-listitem slds-chat-listitem_inbound" key={message.Id} if:false={message.Outgoing__c}>
+                        <div class="slds-chat-message" if:true={message.MessageContent__c}>
+                            <span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                                <abbr class="slds-avatar__initials slds-avatar__initials_inverse" title={message.CustomerName__c}>AM</abbr>
+                            </span>
+                            <div class="slds-chat-message__body">
+                                <div class="slds-chat-message__text slds-chat-message__text_inbound">
+                                    <span>
+                                        <lightning-formatted-rich-text value={message.MessageContent__c}></lightning-formatted-rich-text>
+                                    </span>
+                                </div>
+                                <div class="slds-chat-message__meta" aria-label={message.areaLabel}>{message.CustomerName__c} • <lightning-formatted-date-time value={message.CreatedDate} hour="2-digit" minute="2-digit" year="2-digit" month="short" day="2-digit"></lightning-formatted-date-time></div>
+                            </div>
+                        </div>
+                    </li>
+                    <!-- Message From Salesforce -->
+                    <li class="slds-chat-listitem slds-chat-listitem_outbound" key={message.Id} if:true={message.Outgoing__c}>
+                        <div class="slds-chat-message" if:true={message.MessageContent__c}>
+                            <!-- <span aria-hidden="true" class="slds-avatar slds-avatar_circle slds-chat-avatar">
+                                <abbr class="slds-avatar__initials slds-avatar__initials_inverse" title={message.AgentName__c}>AM</abbr>
+                            </span> -->
+                            <div class="slds-chat-message__body">
+                                <div class="slds-chat-message__text slds-chat-message__text_outbound">
+                                    <span>
+                                        <lightning-formatted-rich-text value={message.MessageContent__c}></lightning-formatted-rich-text>
+                                    </span>
+                                </div>
+                                <div class="slds-chat-message__meta" aria-label={message.areaLabel}>{message.AgentName__c} • <lightning-formatted-date-time value={message.CreatedDate} hour="2-digit" minute="2-digit" year="2-digit" month="short" day="2-digit"></lightning-formatted-date-time></div>
+                            </div>
+                        </div>
+                    </li>
+                </template>
+            </ul>
+            <div if:true={showMessages} class="slds-m-around_small">
+                <lightning-button-icon onclick={handleSendMessage} class="btnIconOverlay" icon-name="utility:send">
+                </lightning-button-icon>
+                <lightning-input class="chat-input"
+                    type="text"
+                    value={messageText}
+                    placeholder="type here....."
+                    message-when-value-missing="Please provide a valid message for the customer to be sent!"
+                    required
+                    label="Send Message" variant="label-hidden" onchange={handleChange}>
+                </lightning-input>
+            </div>
+        </section>
+        <div slot="footer">
+            Powered by <a href="https://www.aredxb.com/" target="_blank" aria-label="Allegiance Real Estate">@Allegiance Real Estate</a>
+        </div>
+    </lightning-card>
+</template>
